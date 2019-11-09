@@ -25,6 +25,18 @@
       <selfCollide>true</selfCollide>
     </gazebo>
 
+    <gazebo reference="${prefix}ee_fixed_joint">
+        <provideFeedback>true</provideFeedback>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
+          <updateRate>50.0</updateRate>
+          <topicName>ee_forces_torques</topicName>
+          <jointName>${prefix}ee_fixed_joint</jointName>
+      </plugin>
+  </gazebo>
+
   </xacro:macro>
 
 </robot>
