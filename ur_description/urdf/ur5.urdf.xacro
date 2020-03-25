@@ -71,6 +71,7 @@
     <xacro:property name="wrist_1_length" value="${d4 - elbow_offset - shoulder_offset}" />
     <xacro:property name="wrist_2_length" value="${d5}" />
     <xacro:property name="wrist_3_length" value="${d6}" />
+    <xacro:property name="ee_length" value="0.001" />
     <!--property name="shoulder_height" value="0.089159" /-->
     <!--property name="shoulder_offset" value="0.13585" /-->  <!-- shoulder_offset - elbow_offset + wrist_1_length = 0.10915 -->
     <!--property name="upper_arm_length" value="0.42500" /-->
@@ -85,7 +86,7 @@
     <xacro:property name="elbow_radius" value="0.060" />      <!-- manually measured -->
     <xacro:property name="forearm_radius" value="0.040" />    <!-- manually measured -->
     <xacro:property name="wrist_radius" value="0.045" />      <!-- manually measured -->
-
+    <xacro:property name="ee_radius" value="0.035" />
 
     <link name="${prefix}base_link" >
       <visual>
@@ -340,36 +341,31 @@
       </xacro:cylinder_inertial>
     </link>
 
-    <joint name="${prefix}ee_fixed_joint" type="revolute">
+    <joint name="${prefix}fts_fixed_joint" type="revolute">
       <parent link="${prefix}wrist_3_link" />
       <child link = "${prefix}ee_link" />
-      <origin xyz="0.0 ${wrist_3_length} 0.0" rpy="0.0 0.0 ${pi/2.0}" />
+      <origin xyz="0.0 ${wrist_3_length} 0.0" rpy="${pi/2.0} 0.0 0.0" />
       <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
     </joint>
 
     <link name="${prefix}ee_link">
       <collision>
         <geometry>
-          <box size="0.04 0.04 0.04"/>
+          <cylinder length="${ee_length}" radius="${ee_radius}"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="-0.01 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 -${ee_length/2.0}"/>
         <color rgba="1.0 1.0 1.0 1.0"/>
       </collision>
       <visual>
         <geometry>
-          <box size="0.04 0.04 0.04"/>
+          <cylinder length="${ee_length}" radius="${ee_radius}"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="-0.01 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 -${ee_length/2.0}"/>
         <color rgba="1.0 1.0 1.0 1.0"/>
       </visual>
-      <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <mass value="1" />
-        <inertia
-          ixx="1.0" ixy="0.0" ixz="0.0"
-          iyy="1.0" iyz="0.0"
-          izz="1.0" />
-      </inertial>
+      <xacro:cylinder_inertial radius="${ee_radius}" length="${ee_length}" mass="0.01">
+        <origin rpy="0 0 0" xyz="0 0 -${ee_length/2.0}"/>
+      </xacro:cylinder_inertial>
     </link>
 
     <xacro:ur_arm_transmission prefix="${prefix}" hw_interface="${transmission_hw_interface}" />
